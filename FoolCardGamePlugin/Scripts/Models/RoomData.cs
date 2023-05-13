@@ -1,40 +1,46 @@
-﻿using DarkRift;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using DarkRift;
 
-namespace FoolCardGamePlugin.Networking;
+namespace FoolCardGamePlugin.Network;
 
 /// <summary>
-/// Структура комнаты
+/// Данные комнаты
 /// </summary>
 public struct RoomData : IDarkRiftSerializable
 {
-    public string Name;
-    public byte Slots;
-    public byte MaxSlots;
+    public RoomConfig Config;
+    public List<ClientData> Clients;
 
     /// <summary>
     /// Конструктор
     /// </summary>
-    /// <param name="name">Имя комнаты</param>
-    /// <param name="slots">Количество слотов</param>
-    /// <param name="maxSlots">Максимальное количество слотов</param>
-    public RoomData(string name, byte slots, byte maxSlots)
+    public RoomData()
     {
-        Name = name;
-        Slots = slots;
-        MaxSlots = maxSlots;
+        Config = new RoomConfig();
+        Clients = new List<ClientData>();
     }
 
+    /// <summary>
+    /// Конструктор
+    /// </summary>
+    /// <param name="config">Конфиг комнаты</param>
+    public RoomData(RoomConfig config)
+    {
+        Config = config;
+        Clients = new List<ClientData>(Config.MaxSlots);
+    }
+    
     public void Deserialize(DeserializeEvent e)
     {
-        Name = e.Reader.ReadString();
-        Slots = e.Reader.ReadByte();
-        MaxSlots = e.Reader.ReadByte();
+        Config = e.Reader.ReadSerializable<RoomConfig>();
+        Clients = e.Reader.ReadSerializables<ClientData>().ToList();
     }
 
     public void Serialize(SerializeEvent e)
     {
-        e.Writer.Write(Name);
-        e.Writer.Write(Slots);
-        e.Writer.Write(MaxSlots);
+        e.Writer.Write(Config);
+        e.Writer.Write(Clients.ToArray());
     }
 }

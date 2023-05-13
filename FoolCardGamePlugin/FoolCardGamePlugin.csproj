@@ -55,15 +55,16 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Scripts\Controllers\RoomController.cs" />
     <Compile Include="Scripts\Enums\Tags.cs" />
+    <Compile Include="Scripts\Models\ClientData.cs" />
     <Compile Include="Scripts\Models\ConnectedClient.cs" />
     <Compile Include="Scripts\Models\RoomData.cs" />
-    <Compile Include="Scripts\Models\RoomRequest.cs" />
-    <Compile Include="Scripts\Models\RoomResponse.cs" />
-    <Compile Include="Scripts\Networking\FoolCardGamePlugin.cs" />
-    <Compile Include="Scripts\Networking\RoomController.cs" />
-    <Compile Include="Scripts\Networking\RoomMediator.cs" />
-    <Compile Include="Scripts\Networking\ServerManager.cs" />
+    <Compile Include="Scripts\Models\RoomConfig.cs" />
+    <Compile Include="Scripts\Network\FoolCardGamePlugin.cs" />
+    <Compile Include="Scripts\Network\RoomsController.cs" />
+    <Compile Include="Scripts\Network\RoomNetworkController.cs" />
+    <Compile Include="Scripts\Network\ServerManager.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
  </Project>

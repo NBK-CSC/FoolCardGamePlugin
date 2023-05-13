@@ -1,4 +1,4 @@
-﻿namespace FoolCardGamePlugin.Networking.Enums
+﻿namespace FoolCardGamePlugin.Network.Enums
 {
     /// <summary>
     /// Теги отправки сообщений
@@ -7,5 +7,6 @@
     {
         CreateRoom = 0,
         GetRooms = 1,
+        JoinRoom = 2
     }
 }

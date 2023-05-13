@@ -1,6 +1,6 @@
 ﻿using DarkRift.Server;
 
-namespace FoolCardGamePlugin.Networking;
+namespace FoolCardGamePlugin.Network;
 
 /// <summary>
 /// Класс подключенного клиента
@@ -8,7 +8,7 @@ namespace FoolCardGamePlugin.Networking;
 public class ConnectedClient
 {
     public IClient Client;
-    public ushort ClientId;
+    public ClientData Data;
     public bool IsInRoom;
 
     /// <summary>
@@ -18,9 +18,9 @@ public class ConnectedClient
     public ConnectedClient(IClient client)
     {
         Client = client;
-        ClientId = client.ID;
+        Data = new ClientData(client.ID.ToString(), false);
         IsInRoom = false;
         
-        ServerManager.Instance.Clients.Add(ClientId, this);
+        ServerManager.Instance.Clients.Add(Data.Id, this);
     }
 }

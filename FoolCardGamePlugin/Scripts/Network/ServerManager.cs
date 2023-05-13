@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace FoolCardGamePlugin.Networking;
+namespace FoolCardGamePlugin.Network;
 
 /// <summary>
 /// Менеджер сервера
@@ -9,7 +9,7 @@ public class ServerManager
 {
     private static ServerManager _instance;
 
-    private Dictionary<int, ConnectedClient> _clients;
+    private Dictionary<string, ConnectedClient> _clients;
 
     /// <summary>
     /// Синглтон
@@ -19,10 +19,10 @@ public class ServerManager
     /// <summary>
     /// Словарь клиентов
     /// </summary>
-    public IDictionary<int, ConnectedClient> Clients => _clients;
+    public IDictionary<string, ConnectedClient> Clients => _clients;
 
     private ServerManager()
     {
-        _clients = new Dictionary<int, ConnectedClient>();
+        _clients = new Dictionary<string, ConnectedClient>();
     }
 }

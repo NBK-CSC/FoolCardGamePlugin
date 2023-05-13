@@ -1,8 +1,10 @@
 ﻿using System;
+using System.Diagnostics;
+using DarkRift;
 using DarkRift.Server;
-using FoolCardGamePlugin.Networking.Enums;
+using FoolCardGamePlugin.Network.Enums;
 
-namespace FoolCardGamePlugin.Networking;
+namespace FoolCardGamePlugin.Network;
 
 /// <summary>
 /// Кастомный плагин
@@ -42,15 +44,20 @@ public class FoolCardGamePlugin : Plugin
     private void OnClientMessageReceived(object? sender, MessageReceivedEventArgs e)
     {
         IClient client = (IClient)sender;
-        if (ServerManager.Instance.Clients.ContainsKey(client.ID) == false)
+        string id = client.ID.ToString();
+        if (ServerManager.Instance.Clients.ContainsKey(id) == false)
             new ConnectedClient((IClient)sender);
+        
         switch (e.Tag)
         {
             case (ushort)Tags.CreateRoom:
-                RoomMediator.Instance.Create(ServerManager.Instance.Clients[client.ID], e);
+                RoomNetworkController.Instance.Create(ServerManager.Instance.Clients[id], e);
                 break;
             case (ushort)Tags.GetRooms:
-                //TODO отправку комнат
+                //RoomNetworkController.Instance.Create(ServerManager.Instance.Clients[id], e);
+                break;
+            case (ushort)Tags.JoinRoom:
+                RoomNetworkController.Instance.JoinRoom(ServerManager.Instance.Clients[id], e);
                 break;
         }
     }
