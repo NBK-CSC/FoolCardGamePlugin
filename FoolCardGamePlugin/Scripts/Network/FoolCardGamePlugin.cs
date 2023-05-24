@@ -38,6 +38,7 @@ public class FoolCardGamePlugin : Plugin
 
     private void OnClientDisconnected(object? sender, ClientDisconnectedEventArgs e)
     {
+        RoomNetworkController.Instance.LeaveRoom(ServerManager.Instance.Clients[e.Client.ID.ToString()]);
         e.Client.MessageReceived -= OnClientMessageReceived;
     }
 
@@ -45,6 +46,7 @@ public class FoolCardGamePlugin : Plugin
     {
         IClient client = (IClient)sender;
         string id = client.ID.ToString();
+        
         if (ServerManager.Instance.Clients.ContainsKey(id) == false)
             new ConnectedClient((IClient)sender);
         
@@ -58,6 +60,9 @@ public class FoolCardGamePlugin : Plugin
                 break;
             case (ushort)Tags.JoinRoom:
                 RoomNetworkController.Instance.JoinRoom(ServerManager.Instance.Clients[id], e);
+                break;
+            case (ushort)Tags.LeaveRoom:
+                RoomNetworkController.Instance.LeaveRoom(ServerManager.Instance.Clients[id]);
                 break;
         }
     }

@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using DarkRift;
 using DarkRift.Server;
 using FoolCardGamePlugin.Network.Enums;
@@ -59,7 +60,13 @@ public class RoomNetworkController
         client.IsInRoom = true;
         SendRequest(Tags.JoinRoom, client.Client, _roomsController.Rooms[room.Id].GetData());
     }
-    
+
+    public void LeaveRoom(ConnectedClient client)
+    {
+        if (client.IsInRoom && _roomsController.LeaveRoom(client.Data))
+            client.IsInRoom = false;
+    }
+
     private string GetNextId()
     {
         //TODO сделать генерацию

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using FoolCardGamePlugin.Controllers;
 
 namespace FoolCardGamePlugin.Network;
@@ -39,14 +40,26 @@ public class RoomsController
     /// Удалить комнату
     /// </summary>
     /// <param name="id">ID комнаты</param>
-    public void RemoveRoom(string id)
+    private void RemoveRoom(string id)
     {
         if (_rooms.ContainsKey(id))
+        {
             _rooms.Remove(id);
+        }
     }
 
     public bool JoinRoom(ClientData client, string id)
     {
         return _rooms.ContainsKey(id) && _rooms[id].TryAddClient(client);
+    }
+
+    public bool LeaveRoom(ClientData client)
+    {
+        var roomPair = _rooms.FirstOrDefault(keyValuePair => keyValuePair.Value.TryRemoveClient(client));
+        if (roomPair.Equals(default))
+            return false;
+        if (roomPair.Value.IsEmpty)
+            RemoveRoom(roomPair.Key);
+        return true;
     }
 }

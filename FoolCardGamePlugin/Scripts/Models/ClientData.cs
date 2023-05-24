@@ -1,4 +1,5 @@
-﻿using DarkRift;
+﻿using System;
+using DarkRift;
 
 namespace FoolCardGamePlugin.Network;
 
@@ -9,7 +10,9 @@ public struct ClientData : IDarkRiftSerializable
 {
     public string Id;
     public bool State;
-    
+
+    public ClientData() : this("", false) { }
+
     /// <summary>
     /// Конструктор
     /// </summary>

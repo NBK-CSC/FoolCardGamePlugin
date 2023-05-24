@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using FoolCardGamePlugin.Network;
 
 namespace FoolCardGamePlugin.Controllers;
@@ -23,6 +24,8 @@ public class RoomController
             _clients.Add(new ClientData());
     }
 
+    public bool IsEmpty => _clients.Any(x => x.Id == null);
+
     public bool TryAddClient(ClientData clientData)
     {
         for (int i = 0; i < _clients.Count; i++)
@@ -31,6 +34,7 @@ public class RoomController
                 continue;
             
             _clients[i] = clientData;
+            _config.Slots++;
             return true;
         }
 
@@ -44,6 +48,7 @@ public class RoomController
             if (string.Equals(_clients[i].Id,clientData.Id))
             {
                 _clients[i] = default;
+                _config.Slots--;
                 return true;
             }
         }
