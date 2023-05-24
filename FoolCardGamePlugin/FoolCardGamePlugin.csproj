@@ -62,6 +62,8 @@
     <Compile Include="Scripts\Models\RoomData.cs" />
     <Compile Include="Scripts\Models\RoomConfig.cs" />
     <Compile Include="Scripts\Network\FoolCardGamePlugin.cs" />
+    <Compile Include="Scripts\Network\NetworkReader.cs" />
+    <Compile Include="Scripts\Network\NetworkSender.cs" />
     <Compile Include="Scripts\Network\RoomsController.cs" />
     <Compile Include="Scripts\Network\RoomNetworkController.cs" />
     <Compile Include="Scripts\Network\ServerManager.cs" />

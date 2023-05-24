@@ -2,6 +2,7 @@
 using System.Diagnostics;
 using DarkRift;
 using DarkRift.Server;
+using FoolCardGamePlugin.Controllers;
 using FoolCardGamePlugin.Network.Enums;
 
 namespace FoolCardGamePlugin.Network;
@@ -14,10 +15,14 @@ public class FoolCardGamePlugin : Plugin
     public override Version Version => new Version(0, 0, 1);
     public override bool ThreadSafe => false;
 
+    private RoomNetworkController _roomNetworkController;
+
     public FoolCardGamePlugin(PluginLoadData pluginLoadData) : base(pluginLoadData)
     {
         ClientManager.ClientConnected += OnClientConnected;
         ClientManager.ClientDisconnected += OnClientDisconnected;
+
+        _roomNetworkController = new RoomNetworkController();
     }
 
     protected override void Dispose(bool disposing)
@@ -38,7 +43,7 @@ public class FoolCardGamePlugin : Plugin
 
     private void OnClientDisconnected(object? sender, ClientDisconnectedEventArgs e)
     {
-        RoomNetworkController.Instance.LeaveRoom(ServerManager.Instance.Clients[e.Client.ID.ToString()]);
+        _roomNetworkController.LeaveRoom(ServerManager.Instance.Clients[e.Client.ID.ToString()]);
         e.Client.MessageReceived -= OnClientMessageReceived;
     }
 
@@ -53,16 +58,16 @@ public class FoolCardGamePlugin : Plugin
         switch (e.Tag)
         {
             case (ushort)Tags.CreateRoom:
-                RoomNetworkController.Instance.Create(ServerManager.Instance.Clients[id], e);
+                _roomNetworkController.Create(ServerManager.Instance.Clients[id], e);
                 break;
             case (ushort)Tags.GetRooms:
                 //RoomNetworkController.Instance.Create(ServerManager.Instance.Clients[id], e);
                 break;
             case (ushort)Tags.JoinRoom:
-                RoomNetworkController.Instance.JoinRoom(ServerManager.Instance.Clients[id], e);
+                _roomNetworkController.JoinRoom(ServerManager.Instance.Clients[id], e);
                 break;
             case (ushort)Tags.LeaveRoom:
-                RoomNetworkController.Instance.LeaveRoom(ServerManager.Instance.Clients[id]);
+                _roomNetworkController.LeaveRoom(ServerManager.Instance.Clients[id]);
                 break;
         }
     }

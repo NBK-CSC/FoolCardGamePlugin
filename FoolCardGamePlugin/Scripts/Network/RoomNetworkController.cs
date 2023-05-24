@@ -1,25 +1,22 @@
-﻿using System;
-using System.Linq;
-using DarkRift;
+﻿using System.Linq;
 using DarkRift.Server;
 using FoolCardGamePlugin.Network.Enums;
 
 namespace FoolCardGamePlugin.Network;
 
 /// <summary>
-/// Медиатор комнаты
+/// Сетевой контролер комнаты
 /// </summary>
 public class RoomNetworkController
 {
-    private static RoomNetworkController _instance;
     private readonly RoomsController _roomsController;
 
     /// <summary>
     /// Синглтон
     /// </summary>
-    public static RoomNetworkController Instance => _instance ??= new RoomNetworkController();
+    //public static RoomNetworkController Instance => _instance ??= new RoomNetworkController();
     
-    private RoomNetworkController()
+    public RoomNetworkController()
     {
         _roomsController = new RoomsController();
     }
@@ -33,14 +30,14 @@ public class RoomNetworkController
     {
         if (client.IsInRoom)
         {
-            SendRequest(Tags.CreateRoom, client.Client, new RoomConfig());
+            NetworkSender.Instance.SendRequest(Tags.CreateRoom, client.Client, new RoomConfig());
             return;
         }
         
         string id = GetNextId();
         
-        _roomsController.CreateRoom(id, ReadRoom(e));
-        SendRequest(Tags.CreateRoom, client.Client, _roomsController.Rooms[id].GetData().Config);
+        _roomsController.CreateRoom(id, NetworkReader.Instance.Read<RoomConfig>(e));
+        NetworkSender.Instance.SendRequest(Tags.CreateRoom, client.Client, _roomsController.Rooms[id].GetData().Config);
     }
 
     /// <summary>
@@ -50,15 +47,15 @@ public class RoomNetworkController
     /// <param name="e">Сообщение</param>
     public void JoinRoom(ConnectedClient client, MessageReceivedEventArgs e)
     {
-        var room = ReadRoom(e);
+        var room = NetworkReader.Instance.Read<RoomConfig>(e);
         if (client.IsInRoom || _roomsController.JoinRoom(client.Data, room.Id) == false)
         {
-            SendRequest(Tags.JoinRoom, client.Client, new RoomData());
+            NetworkSender.Instance.SendRequest(Tags.JoinRoom, client.Client, new RoomData());
             return;
         }
 
         client.IsInRoom = true;
-        SendRequest(Tags.JoinRoom, client.Client, _roomsController.Rooms[room.Id].GetData());
+        NetworkSender.Instance.SendRequest(Tags.JoinRoom, client.Client, _roomsController.Rooms[room.Id].GetData());
     }
 
     public void LeaveRoom(ConnectedClient client)
@@ -71,39 +68,5 @@ public class RoomNetworkController
     {
         //TODO сделать генерацию
         return (_roomsController.Rooms.Values.Count() + 1).ToString();
-    }
-
-    private RoomConfig ReadRoom(MessageReceivedEventArgs e)
-    {
-        using (var message = e.GetMessage())
-        {
-            return message.Deserialize<RoomConfig>();
-        }
-    }
-    
-    private void SendRequest<T>(Tags tag, IClient client, T data, SendMode sendMode = SendMode.Reliable) where T : IDarkRiftSerializable
-    {
-        using (var writer = DarkRiftWriter.Create())
-        {
-            writer.Write(data);
-            SendMessage(tag, client, writer, sendMode);
-        }
-    }
-
-    private void SendRequest<T>(Tags tag, IClient client, T[] data, SendMode sendMode = SendMode.Reliable) where T : IDarkRiftSerializable
-    {
-        using (var writer = DarkRiftWriter.Create())
-        {
-            writer.Write(data);
-            SendMessage(tag, client, writer, sendMode);
-        }
-    }
-    
-    private void SendMessage(Tags tag, IClient client, DarkRiftWriter writer, SendMode sendMode)
-    {
-        using (var message = Message.Create((ushort)tag, writer))
-        {
-            client.SendMessage(message, sendMode);
-        }
     }
 }
