@@ -61,7 +61,7 @@ public class FoolCardGamePlugin : Plugin
                 _roomNetworkController.Create(ServerManager.Instance.Clients[id], e);
                 break;
             case (ushort)Tags.GetRooms:
-                //RoomNetworkController.Instance.Create(ServerManager.Instance.Clients[id], e);
+                _roomNetworkController.GetRooms(ServerManager.Instance.Clients[id]);
                 break;
             case (ushort)Tags.JoinRoom:
                 _roomNetworkController.JoinRoom(ServerManager.Instance.Clients[id], e);

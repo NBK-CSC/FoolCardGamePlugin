@@ -16,6 +16,9 @@ public class RoomsController
     /// Словарь комнат
     /// </summary>
     public IReadOnlyDictionary<string, RoomController> Rooms => _rooms;
+    
+    
+    public IEnumerable<RoomConfig> RoomsConfigs => _rooms.Values.Select(r => r.GetConfig());
 
     /// <summary>
     /// Конструктор

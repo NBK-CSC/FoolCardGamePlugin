@@ -63,4 +63,9 @@ public class RoomController
         
         return _data;
     }
+    
+    public RoomConfig GetConfig()
+    {
+        return _config;
+    }
 }

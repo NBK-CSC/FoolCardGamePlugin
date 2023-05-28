@@ -57,6 +57,16 @@ public class RoomNetworkController
         client.IsInRoom = true;
         NetworkSender.Instance.SendRequest(Tags.JoinRoom, client.Client, _roomsController.Rooms[room.Id].GetData());
     }
+    
+    /// <summary>
+    /// Присоединиться к комнату
+    /// </summary>
+    /// <param name="client">Подключенный клиент</param>
+    /// <param name="e">Сообщение</param>
+    public void GetRooms(ConnectedClient client)
+    {
+        NetworkSender.Instance.SendRequest(Tags.GetRooms, client.Client, _roomsController.RoomsConfigs.ToArray());
+    }
 
     public void LeaveRoom(ConnectedClient client)
     {
