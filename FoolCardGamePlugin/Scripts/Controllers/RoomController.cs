@@ -13,6 +13,10 @@ public class RoomController
     private RoomData _data;
     private List<ClientData> _clients;
 
+    /// <summary>
+    /// Конструктор
+    /// </summary>
+    /// <param name="config">Конфиг комнаты</param>
     public RoomController(RoomConfig config)
     {
         _config = config;
@@ -24,8 +28,16 @@ public class RoomController
             _clients.Add(new ClientData());
     }
 
-    public bool IsEmpty => _clients.Any(x => x.Id == null);
+    /// <summary>
+    /// Пуста ли комната?
+    /// </summary>
+    public bool IsEmpty => _clients.All(x => x.Id == null);
 
+    /// <summary>
+    /// Попытка добавить клиента
+    /// </summary>
+    /// <param name="clientData">Инфа клиента</param>
+    /// <returns>Получилось ли добавить клиента?</returns>
     public bool TryAddClient(ClientData clientData)
     {
         for (int i = 0; i < _clients.Count; i++)
@@ -41,13 +53,18 @@ public class RoomController
         return false;
     }
 
+    /// <summary>
+    /// Попытка удалить клиента
+    /// </summary>
+    /// <param name="clientData">Инфа клиента</param>
+    /// <returns>Получилось ли удалить?</returns>
     public bool TryRemoveClient(ClientData clientData)
     {
         for (int i = 0; i < _clients.Capacity; i++)
         {
             if (string.Equals(_clients[i].Id,clientData.Id))
             {
-                _clients[i] = default;
+                _clients[i] = new ClientData();
                 _config.Slots--;
                 return true;
             }
@@ -56,6 +73,10 @@ public class RoomController
         return false;
     }
 
+    /// <summary>
+    /// Получить инфу комнаты
+    /// </summary>
+    /// <returns>Инфа комнаты</returns>
     public RoomData GetData()
     {
         _data.Config = _config;
@@ -64,6 +85,10 @@ public class RoomController
         return _data;
     }
     
+    /// <summary>
+    /// Получить конфиг комнаты
+    /// </summary>
+    /// <returns>Конфиг комнаты</returns>
     public RoomConfig GetConfig()
     {
         return _config;

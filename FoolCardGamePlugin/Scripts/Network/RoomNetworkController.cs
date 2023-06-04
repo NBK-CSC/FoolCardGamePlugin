@@ -15,7 +15,6 @@ public class RoomNetworkController
     /// Синглтон
     /// </summary>
     //public static RoomNetworkController Instance => _instance ??= new RoomNetworkController();
-    
     public RoomNetworkController()
     {
         _roomsController = new RoomsController();
@@ -54,24 +53,44 @@ public class RoomNetworkController
             return;
         }
 
+        var roomData = _roomsController.Rooms[room.Id].GetData();
+        
         client.IsInRoom = true;
-        NetworkSender.Instance.SendRequest(Tags.JoinRoom, client.Client, _roomsController.Rooms[room.Id].GetData());
+        NetworkSender.Instance.SendRequest(Tags.JoinRoom, client.Client, roomData);
+
+        Update(roomData);
+    }
+
+    private void Update(RoomData roomData)
+    {
+        foreach (var clientData in roomData.Clients)
+        {
+            if (string.IsNullOrEmpty(clientData.Id) == false)
+                NetworkSender.Instance.SendRequest(Tags.UpdateRoom, ServerManager.Instance.Clients[clientData.Id].Client, roomData);
+        }
     }
     
     /// <summary>
     /// Присоединиться к комнату
     /// </summary>
     /// <param name="client">Подключенный клиент</param>
-    /// <param name="e">Сообщение</param>
     public void GetRooms(ConnectedClient client)
     {
         NetworkSender.Instance.SendRequest(Tags.GetRooms, client.Client, _roomsController.RoomsConfigs.ToArray());
     }
 
+    /// <summary>
+    /// Покинуть комнату
+    /// </summary>
+    /// <param name="client">Подключенный клиент</param>
     public void LeaveRoom(ConnectedClient client)
     {
-        if (client.IsInRoom && _roomsController.LeaveRoom(client.Data))
+        if (client.IsInRoom && _roomsController.LeaveRoom(client.Data, out var roomId))
+        {
             client.IsInRoom = false;
+            if (string.IsNullOrEmpty(roomId) == false)
+                Update(_roomsController.Rooms[roomId].GetData());
+        }
     }
 
     private string GetNextId()

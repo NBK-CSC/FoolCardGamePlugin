@@ -43,7 +43,11 @@ public class FoolCardGamePlugin : Plugin
 
     private void OnClientDisconnected(object? sender, ClientDisconnectedEventArgs e)
     {
-        _roomNetworkController.LeaveRoom(ServerManager.Instance.Clients[e.Client.ID.ToString()]);
+        if (ServerManager.Instance.Clients.ContainsKey(e.Client.ID.ToString()))
+        {
+            _roomNetworkController.LeaveRoom(ServerManager.Instance.Clients[e.Client.ID.ToString()]);
+            ServerManager.Instance.Clients.Remove(e.Client.ID.ToString());
+        }
         e.Client.MessageReceived -= OnClientMessageReceived;
     }
 

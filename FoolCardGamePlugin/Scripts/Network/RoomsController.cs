@@ -56,13 +56,18 @@ public class RoomsController
         return _rooms.ContainsKey(id) && _rooms[id].TryAddClient(client);
     }
 
-    public bool LeaveRoom(ClientData client)
+    public bool LeaveRoom(ClientData client, out string roomId)
     {
         var roomPair = _rooms.FirstOrDefault(keyValuePair => keyValuePair.Value.TryRemoveClient(client));
         if (roomPair.Equals(default))
+        {
+            roomId = "";
             return false;
+        }
         if (roomPair.Value.IsEmpty)
             RemoveRoom(roomPair.Key);
+        
+        roomId = roomPair.Key;
         return true;
     }
 }
