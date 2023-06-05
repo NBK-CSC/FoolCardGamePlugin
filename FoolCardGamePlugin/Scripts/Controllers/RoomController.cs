@@ -31,7 +31,7 @@ public class RoomController
     /// <summary>
     /// Пуста ли комната?
     /// </summary>
-    public bool IsEmpty => _clients.All(x => x.Id == null);
+    public bool IsEmpty => _clients.All(x => string.IsNullOrEmpty(x.Id));
 
     /// <summary>
     /// Попытка добавить клиента

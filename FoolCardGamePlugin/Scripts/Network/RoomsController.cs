@@ -64,8 +64,13 @@ public class RoomsController
             roomId = "";
             return false;
         }
+
         if (roomPair.Value.IsEmpty)
+        {
             RemoveRoom(roomPair.Key);
+            roomId = "";
+            return true;
+        }
         
         roomId = roomPair.Key;
         return true;
