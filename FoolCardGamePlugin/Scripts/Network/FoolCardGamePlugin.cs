@@ -73,6 +73,9 @@ public class FoolCardGamePlugin : Plugin
             case (ushort)Tags.LeaveRoom:
                 _roomNetworkController.LeaveRoom(ServerManager.Instance.Clients[id]);
                 break;
+            case (ushort)Tags.UpdateRoom:
+                _roomNetworkController.UpdateInfo(e);
+                break;
         }
     }
 }

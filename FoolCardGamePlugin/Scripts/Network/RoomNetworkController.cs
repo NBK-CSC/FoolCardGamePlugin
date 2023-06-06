@@ -61,6 +61,11 @@ public class RoomNetworkController
         Update(roomData);
     }
 
+    public void UpdateInfo(MessageReceivedEventArgs e)
+    {
+        Update(NetworkReader.Instance.Read<RoomData>(e));
+    }
+
     private void Update(RoomData roomData)
     {
         foreach (var clientData in roomData.Clients)

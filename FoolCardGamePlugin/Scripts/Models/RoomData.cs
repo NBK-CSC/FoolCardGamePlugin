@@ -12,6 +12,7 @@ public struct RoomData : IDarkRiftSerializable
 {
     public RoomConfig Config;
     public List<ClientData> Clients;
+    public bool IsStart;
 
     /// <summary>
     /// Конструктор
@@ -20,6 +21,7 @@ public struct RoomData : IDarkRiftSerializable
     {
         Config = new RoomConfig();
         Clients = new List<ClientData>();
+        IsStart = false;
     }
 
     /// <summary>
@@ -30,17 +32,20 @@ public struct RoomData : IDarkRiftSerializable
     {
         Config = config;
         Clients = new List<ClientData>(Config.MaxSlots);
+        IsStart = false;
     }
     
     public void Deserialize(DeserializeEvent e)
     {
         Config = e.Reader.ReadSerializable<RoomConfig>();
         Clients = e.Reader.ReadSerializables<ClientData>().ToList();
+        IsStart = e.Reader.ReadBoolean();
     }
 
     public void Serialize(SerializeEvent e)
     {
         e.Writer.Write(Config);
         e.Writer.Write(Clients.ToArray());
+        e.Writer.Write(IsStart);
     }
 }
