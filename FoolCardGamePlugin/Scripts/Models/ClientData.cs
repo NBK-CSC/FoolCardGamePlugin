@@ -1,7 +1,7 @@
 ﻿using System;
 using DarkRift;
 
-namespace FoolCardGamePlugin.Network;
+namespace FoolCardGamePlugin.Models;
 
 /// <summary>
 /// Данные клиента

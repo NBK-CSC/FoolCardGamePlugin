@@ -34,11 +34,19 @@ public class NetworkSender
         }
     }
     
-    private void SendMessage(Tags tag, IClient client, DarkRiftWriter writer, SendMode sendMode)
+    public void SendRequest(Tags tag, IMessageSinkSource sinkSource, SendMode sendMode = SendMode.Reliable)
+    {
+        using (Message message = Message.CreateEmpty((ushort)tag))
+        {
+            sinkSource.SendMessage(message, sendMode);
+        }
+    }
+    
+    private void SendMessage(Tags tag, IMessageSinkSource sinkSource, DarkRiftWriter writer, SendMode sendMode)
     {
         using (var message = Message.Create((ushort)tag, writer))
         {
-            client.SendMessage(message, sendMode);
+            sinkSource.SendMessage(message, sendMode);
         }
     }
 }

@@ -1,8 +1,6 @@
 ﻿using System;
-using System.Diagnostics;
-using DarkRift;
 using DarkRift.Server;
-using FoolCardGamePlugin.Controllers;
+using FoolCardGamePlugin.Models;
 using FoolCardGamePlugin.Network.Enums;
 
 namespace FoolCardGamePlugin.Network;
@@ -15,14 +13,16 @@ public class FoolCardGamePlugin : Plugin
     public override Version Version => new Version(0, 0, 1);
     public override bool ThreadSafe => false;
 
-    private RoomNetworkController _roomNetworkController;
+    private readonly RoomNetworkController _roomNetworkController;
+    private readonly MatchNetworkController _matchNetworkController;
 
     public FoolCardGamePlugin(PluginLoadData pluginLoadData) : base(pluginLoadData)
     {
         ClientManager.ClientConnected += OnClientConnected;
         ClientManager.ClientDisconnected += OnClientDisconnected;
 
-        _roomNetworkController = new RoomNetworkController();
+        _matchNetworkController = new MatchNetworkController();
+        _roomNetworkController = new RoomNetworkController(_matchNetworkController, _matchNetworkController);
     }
 
     protected override void Dispose(bool disposing)
@@ -73,8 +73,17 @@ public class FoolCardGamePlugin : Plugin
             case (ushort)Tags.LeaveRoom:
                 _roomNetworkController.LeaveRoom(ServerManager.Instance.Clients[id]);
                 break;
-            case (ushort)Tags.UpdateRoom:
-                _roomNetworkController.UpdateInfo(e);
+            case (ushort)Tags.UpdateClient:
+                _roomNetworkController.UpdateClientData(ServerManager.Instance.Clients[id], e);
+                break;
+            case (ushort)Tags.GetCards:
+                _matchNetworkController.GetCards(ServerManager.Instance.Clients[id], e);
+                break;
+            case (ushort)Tags.UpdatePlayer:
+                _matchNetworkController.UpdatePlayerData(ServerManager.Instance.Clients[id], e);
+                break;
+            case (ushort)Tags.UpdateMatch:
+                _matchNetworkController.UpdateMatch(ServerManager.Instance.Clients[id], e);
                 break;
         }
     }

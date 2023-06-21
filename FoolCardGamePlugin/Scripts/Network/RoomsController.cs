@@ -1,7 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using FoolCardGamePlugin.Controllers;
+using FoolCardGamePlugin.Models;
 
 namespace FoolCardGamePlugin.Network;
 
@@ -18,7 +18,9 @@ public class RoomsController
     public IReadOnlyDictionary<string, RoomController> Rooms => _rooms;
     
     
-    public IEnumerable<RoomConfig> RoomsConfigs => _rooms.Values.Select(r => r.GetConfig());
+    public IEnumerable<RoomConfig> RoomsConfigs => _rooms.Values
+        .Where(r => r.IsStarted == false)
+        .Select(r => r.GetData().Config);
 
     /// <summary>
     /// Конструктор

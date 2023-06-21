@@ -1,5 +1,8 @@
-﻿using System.Linq;
+﻿using System.Collections.Generic;
+using System.Linq;
 using DarkRift.Server;
+using FoolCardGamePlugin.Abstractions.Network;
+using FoolCardGamePlugin.Models;
 using FoolCardGamePlugin.Network.Enums;
 
 namespace FoolCardGamePlugin.Network;
@@ -10,13 +13,16 @@ namespace FoolCardGamePlugin.Network;
 public class RoomNetworkController
 {
     private readonly RoomsController _roomsController;
+    private readonly IMatchCreating _matchCreator;
+    private readonly IMatchStopping _matchStopper;
 
     /// <summary>
     /// Синглтон
     /// </summary>
-    //public static RoomNetworkController Instance => _instance ??= new RoomNetworkController();
-    public RoomNetworkController()
+    public RoomNetworkController(IMatchCreating matchCreator, IMatchStopping matchStopper)
     {
+        _matchCreator = matchCreator;
+        _matchStopper = matchStopper;
         _roomsController = new RoomsController();
     }
 
@@ -61,9 +67,22 @@ public class RoomNetworkController
         Update(roomData);
     }
 
-    public void UpdateInfo(MessageReceivedEventArgs e)
+    public void UpdateClientData(ConnectedClient client, MessageReceivedEventArgs e)
     {
-        Update(NetworkReader.Instance.Read<RoomData>(e));
+        var roomData = NetworkReader.Instance.Read<RoomData>(e);
+        var roomId = roomData.Config.Id;
+        
+        _roomsController.Rooms[roomId].UpdateClientData(roomData.Clients.Find(c => c.Id == client.Data.Id));
+        
+        if (CheckAllPlayerConfirm(_roomsController.Rooms[roomId].GetData().Clients) && _matchCreator.TryCreateMatch(roomData))
+            _roomsController.Rooms[roomId].IsStarted = true;
+        
+        Update(_roomsController.Rooms[roomId].GetData());
+    }
+
+    private bool CheckAllPlayerConfirm(IEnumerable<ClientData> clients)
+    {
+        return clients.All(c => c.State);
     }
 
     private void Update(RoomData roomData)
@@ -94,7 +113,11 @@ public class RoomNetworkController
         {
             client.IsInRoom = false;
             if (string.IsNullOrEmpty(roomId) == false)
+            {
+                _matchStopper.StopMatch(roomId);
+                _roomsController.Rooms[roomId].IsStarted = false;
                 Update(_roomsController.Rooms[roomId].GetData());
+            }
         }
     }
 

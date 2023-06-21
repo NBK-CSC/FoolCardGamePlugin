@@ -1,9 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using DarkRift;
 
-namespace FoolCardGamePlugin.Network;
+namespace FoolCardGamePlugin.Models;
 
 /// <summary>
 /// Данные комнаты
@@ -12,17 +11,12 @@ public struct RoomData : IDarkRiftSerializable
 {
     public RoomConfig Config;
     public List<ClientData> Clients;
-    public bool IsStart;
+    public bool IsStarted;
 
     /// <summary>
     /// Конструктор
     /// </summary>
-    public RoomData()
-    {
-        Config = new RoomConfig();
-        Clients = new List<ClientData>();
-        IsStart = false;
-    }
+    public RoomData() : this(new RoomConfig()) { }
 
     /// <summary>
     /// Конструктор
@@ -32,20 +26,20 @@ public struct RoomData : IDarkRiftSerializable
     {
         Config = config;
         Clients = new List<ClientData>(Config.MaxSlots);
-        IsStart = false;
+        IsStarted = false;
     }
     
     public void Deserialize(DeserializeEvent e)
     {
         Config = e.Reader.ReadSerializable<RoomConfig>();
         Clients = e.Reader.ReadSerializables<ClientData>().ToList();
-        IsStart = e.Reader.ReadBoolean();
+        IsStarted = e.Reader.ReadBoolean();
     }
 
     public void Serialize(SerializeEvent e)
     {
         e.Writer.Write(Config);
         e.Writer.Write(Clients.ToArray());
-        e.Writer.Write(IsStart);
+        e.Writer.Write(IsStarted);
     }
 }

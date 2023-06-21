@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using FoolCardGamePlugin.Network;
+using FoolCardGamePlugin.Models;
 
 namespace FoolCardGamePlugin.Controllers;
 
@@ -9,19 +9,22 @@ namespace FoolCardGamePlugin.Controllers;
 /// </summary>
 public class RoomController
 {
-    private RoomConfig _config;
     private RoomData _data;
     private List<ClientData> _clients;
 
+    public bool IsStarted
+    {
+        get => _data.IsStarted;
+        set => _data.IsStarted = value;
+    }
+    
     /// <summary>
     /// Конструктор
     /// </summary>
     /// <param name="config">Конфиг комнаты</param>
     public RoomController(RoomConfig config)
     {
-        _config = config;
         _data = new RoomData(config);
-
         _clients = new List<ClientData>(config.MaxSlots);
         
         for (int i = 0; i < config.MaxSlots; i++)
@@ -46,7 +49,7 @@ public class RoomController
                 continue;
             
             _clients[i] = clientData;
-            _config.Slots++;
+            _data.Config.Slots++;
             return true;
         }
 
@@ -65,12 +68,21 @@ public class RoomController
             if (string.Equals(_clients[i].Id,clientData.Id))
             {
                 _clients[i] = new ClientData();
-                _config.Slots--;
+                _data.Config.Slots--;
                 return true;
             }
         }
 
         return false;
+    }
+
+    public void UpdateClientData(ClientData clientData)
+    {
+        for (int i = 0; i < _clients.Count; i++)
+        {
+            if (string.Equals(_clients[i].Id,clientData.Id))
+                _clients[i] = clientData;
+        }
     }
 
     /// <summary>
@@ -79,18 +91,7 @@ public class RoomController
     /// <returns>Инфа комнаты</returns>
     public RoomData GetData()
     {
-        _data.Config = _config;
         _data.Clients = _clients;
-        
         return _data;
-    }
-    
-    /// <summary>
-    /// Получить конфиг комнаты
-    /// </summary>
-    /// <returns>Конфиг комнаты</returns>
-    public RoomConfig GetConfig()
-    {
-        return _config;
     }
 }

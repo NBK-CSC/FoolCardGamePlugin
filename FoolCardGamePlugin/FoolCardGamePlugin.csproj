@@ -55,18 +55,32 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Scripts\Abstractions\Network\IMatchCreating.cs" />
+    <Compile Include="Scripts\Abstractions\Network\IMatchStopping.cs" />
+    <Compile Include="Scripts\Controllers\MatchController.cs" />
     <Compile Include="Scripts\Controllers\RoomController.cs" />
+    <Compile Include="Scripts\Controllers\RoundController.cs" />
+    <Compile Include="Scripts\Enums\Seniority.cs" />
+    <Compile Include="Scripts\Enums\Suit.cs" />
     <Compile Include="Scripts\Enums\Tags.cs" />
+    <Compile Include="Scripts\Models\CardData.cs" />
     <Compile Include="Scripts\Models\ClientData.cs" />
     <Compile Include="Scripts\Models\ConnectedClient.cs" />
+    <Compile Include="Scripts\Models\DeskData.cs" />
+    <Compile Include="Scripts\Models\GetCardsData.cs" />
+    <Compile Include="Scripts\Models\MatchData.cs" />
+    <Compile Include="Scripts\Models\PlayerData.cs" />
     <Compile Include="Scripts\Models\RoomData.cs" />
     <Compile Include="Scripts\Models\RoomConfig.cs" />
+    <Compile Include="Scripts\Models\RoundData.cs" />
     <Compile Include="Scripts\Network\FoolCardGamePlugin.cs" />
+    <Compile Include="Scripts\Network\MatchNetworkController.cs" />
     <Compile Include="Scripts\Network\NetworkReader.cs" />
     <Compile Include="Scripts\Network\NetworkSender.cs" />
     <Compile Include="Scripts\Network\RoomsController.cs" />
     <Compile Include="Scripts\Network\RoomNetworkController.cs" />
     <Compile Include="Scripts\Network\ServerManager.cs" />
+    <Compile Include="Scripts\Network\ShuffleCardController.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
  </Project>
