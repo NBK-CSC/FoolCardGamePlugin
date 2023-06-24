@@ -11,19 +11,19 @@ namespace FoolCardGamePlugin.Network;
 
 public class MatchNetworkController : IMatchCreating, IMatchStopping
 {
-    private readonly Dictionary<string, MatchController> _matches = new ();
+    private readonly MatchesController _matchesController;
+
+    public MatchNetworkController()
+    {
+        _matchesController = new MatchesController();
+    }
     
     public bool TryCreateMatch(RoomData roomData)
     {
-        if (_matches.ContainsKey(roomData.Config.Id))
+        if (_matchesController.TryCreateMatch(roomData, UpdateDesk))
             return false;
         
-        var match = new MatchController(roomData);
-        match.OnMatchUpdated += UpdateDesk;
-        
-        _matches.Add(roomData.Config.Id, match);
         SetClientStatusOnMatch(roomData.Clients, true);
-        
         return true;
     }
     
@@ -33,14 +33,10 @@ public class MatchNetworkController : IMatchCreating, IMatchStopping
             return;
         
         var getCardsData = NetworkReader.Instance.Read<GetCardsData>(e);
-        if (_matches.ContainsKey(getCardsData.PlayerData.RoomId) == false)
+        if (_matchesController.GetCards(ref getCardsData) == false)
             return;
-
-        if (_matches[getCardsData.PlayerData.RoomId].GetCards(getCardsData.PlayerData, getCardsData.Number, out var cards))
-            getCardsData.Cards = cards.ToArray();
         
         NetworkSender.Instance.SendRequest(Tags.GetCards, client.Client, getCardsData);
-        //UpdateDesk(getCardsData.PlayerData.RoomId);
     }
     
     private void SetClientStatusOnMatch(IEnumerable<ClientData> clients, bool status)
@@ -55,9 +51,7 @@ public class MatchNetworkController : IMatchCreating, IMatchStopping
         if (client.IsInRoom == false || client.IsInMatch == false)
             return;
         
-        var playerData = NetworkReader.Instance.Read<PlayerData>(e);
-        _matches[playerData.RoomId].UpdatePlayerData(playerData);
-        //UpdateDesk(playerData.RoomId);
+        _matchesController.UpdatePlayerData(NetworkReader.Instance.Read<PlayerData>(e));
     }
 
     public void UpdateMatch(ConnectedClient client, MessageReceivedEventArgs e)
@@ -70,37 +64,36 @@ public class MatchNetworkController : IMatchCreating, IMatchStopping
 
     private void UpdateDesk(string roomId)
     {
-        if (_matches.ContainsKey(roomId) == false)
+        if (_matchesController[roomId] == null)
             return;
         
-        SendMessagePlayers(roomId, Tags.UpdateMatch, _matches[roomId].Data);
+        SendMessagePlayers(roomId, Tags.UpdateMatch, _matchesController[roomId].Data);
     }
 
     private void SendMessagePlayers<T>(string roomId, Tags tag, T data) where T : IDarkRiftSerializable
     {
-        foreach (var clientId in _matches[roomId].ClientIds())
+        foreach (var clientId in _matchesController[roomId].ClientIds())
             NetworkSender.Instance.SendRequest(tag, ServerManager.Instance.Clients[clientId].Client, data);
     }
     
     private void SendMessagePlayers(string roomId, Tags tag)
     {
-        foreach (var clientId in _matches[roomId].ClientIds())
+        foreach (var clientId in _matchesController[roomId].ClientIds())
             NetworkSender.Instance.SendRequest(tag, ServerManager.Instance.Clients[clientId].Client);
     }
 
     public void StopMatch(string roomId)
     {
-        if (_matches.ContainsKey(roomId) == false)
+        if (_matchesController[roomId] == null)
             return;
 
-        SetClientStatusOnMatch(_matches[roomId].Data.Room.Clients, false);
-        _matches[roomId].OnMatchUpdated -= UpdateDesk;
-        _matches.Remove(roomId);
+        SetClientStatusOnMatch(_matchesController[roomId].Data.Room.Clients, false);
+        _matchesController.RemoveMatch(roomId, UpdateDesk);
     }
 
     public void StopRound(string roomId)
     {
-        if (_matches.ContainsKey(roomId) == false)
+        if (_matchesController[roomId] == null)
             return;
         
         SendMessagePlayers(roomId, Tags.StopRound);
