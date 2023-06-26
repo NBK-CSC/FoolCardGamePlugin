@@ -45,7 +45,7 @@ public class MatchesController
 
     public void RemoveMatch(string roomId, Action<string> unsubscribeAction)
     {
-        if (_matches.ContainsKey(roomId))
+        if (_matches.ContainsKey(roomId) == false)
             return;
         
         _matches[roomId].OnMatchUpdated -= unsubscribeAction;

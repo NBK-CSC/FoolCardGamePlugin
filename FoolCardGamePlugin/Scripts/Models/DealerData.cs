@@ -5,7 +5,7 @@ namespace FoolCardGamePlugin.Models;
 /// <summary>
 /// Данные стола
 /// </summary>
-public struct DeskData : IDarkRiftSerializable
+public struct DealerData : IDarkRiftSerializable
 {
     public byte NumberCardsInDeck { get; set; }
     public CardData TrumpCard { get; private set; }
@@ -15,7 +15,7 @@ public struct DeskData : IDarkRiftSerializable
     /// </summary>
     /// <param name="numberCardsInDeck">Количество карт в колоде</param>
     /// <param name="trumpCard"></param>
-    public DeskData(byte numberCardsInDeck, CardData trumpCard)
+    public DealerData(byte numberCardsInDeck, CardData trumpCard)
     {
         NumberCardsInDeck = numberCardsInDeck;
         TrumpCard = trumpCard;

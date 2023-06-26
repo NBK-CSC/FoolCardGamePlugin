@@ -1,9 +1,11 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using DarkRift.Server;
 using FoolCardGamePlugin.Abstractions.Network;
 using FoolCardGamePlugin.Models;
 using FoolCardGamePlugin.Network.Enums;
+using FoolCardGamePlugin.Repositories;
 
 namespace FoolCardGamePlugin.Network;
 
@@ -35,14 +37,14 @@ public class RoomNetworkController
     {
         if (client.IsInRoom)
         {
-            NetworkSender.Instance.SendRequest(Tags.CreateRoom, client.Client, new RoomConfig());
+            NetworkSender.Instance.SendResponse(Tags.CreateRoom, client.Client, new RoomConfig());
             return;
         }
         
         string id = GetNextId();
         
         _roomsController.CreateRoom(id, NetworkReader.Instance.Read<RoomConfig>(e));
-        NetworkSender.Instance.SendRequest(Tags.CreateRoom, client.Client, _roomsController.Rooms[id].GetData().Config);
+        NetworkSender.Instance.SendResponse(Tags.CreateRoom, client.Client, _roomsController.Rooms[id].GetData().Config);
     }
 
     /// <summary>
@@ -55,14 +57,14 @@ public class RoomNetworkController
         var room = NetworkReader.Instance.Read<RoomConfig>(e);
         if (client.IsInRoom || _roomsController.JoinRoom(client.Data, room.Id) == false)
         {
-            NetworkSender.Instance.SendRequest(Tags.JoinRoom, client.Client, new RoomData());
+            NetworkSender.Instance.SendResponse(Tags.JoinRoom, client.Client, new RoomData());
             return;
         }
 
         var roomData = _roomsController.Rooms[room.Id].GetData();
         
         client.IsInRoom = true;
-        NetworkSender.Instance.SendRequest(Tags.JoinRoom, client.Client, roomData);
+        NetworkSender.Instance.SendResponse(Tags.JoinRoom, client.Client, roomData);
 
         Update(roomData);
     }
@@ -90,7 +92,7 @@ public class RoomNetworkController
         foreach (var clientData in roomData.Clients)
         {
             if (string.IsNullOrEmpty(clientData.Id) == false)
-                NetworkSender.Instance.SendRequest(Tags.UpdateRoom, ServerManager.Instance.Clients[clientData.Id].Client, roomData);
+                NetworkSender.Instance.SendResponse(Tags.UpdateRoom, ServerManager.Instance.Clients[clientData.Id].Client, roomData);
         }
     }
     
@@ -100,7 +102,7 @@ public class RoomNetworkController
     /// <param name="client">Подключенный клиент</param>
     public void GetRooms(ConnectedClient client)
     {
-        NetworkSender.Instance.SendRequest(Tags.GetRooms, client.Client, _roomsController.RoomsConfigs.ToArray());
+        NetworkSender.Instance.SendResponse(Tags.GetRooms, client.Client, _roomsController.RoomsConfigs.ToArray());
     }
 
     /// <summary>

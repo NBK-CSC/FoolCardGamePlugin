@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using FoolCardGamePlugin.Models;
 
-namespace FoolCardGamePlugin.Network;
+namespace FoolCardGamePlugin.Repositories;
 
 /// <summary>
 /// Менеджер сервера
@@ -9,8 +9,6 @@ namespace FoolCardGamePlugin.Network;
 public class ServerManager
 {
     private static ServerManager _instance;
-
-    private Dictionary<string, ConnectedClient> _clients;
 
     /// <summary>
     /// Синглтон
@@ -20,10 +18,7 @@ public class ServerManager
     /// <summary>
     /// Словарь клиентов
     /// </summary>
-    public IDictionary<string, ConnectedClient> Clients => _clients;
+    public IReadOnlyDictionary<string, ConnectedClient> Clients => ClientRepository.Instance.Entities;
 
-    private ServerManager()
-    {
-        _clients = new Dictionary<string, ConnectedClient>();
-    }
+    private ServerManager() { }
 }

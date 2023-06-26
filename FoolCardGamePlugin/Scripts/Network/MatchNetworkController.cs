@@ -1,18 +1,23 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using DarkRift;
+﻿using System;
+using System.Collections.Generic;
 using DarkRift.Server;
 using FoolCardGamePlugin.Abstractions.Network;
-using FoolCardGamePlugin.Controllers;
 using FoolCardGamePlugin.Models;
 using FoolCardGamePlugin.Network.Enums;
+using FoolCardGamePlugin.Repositories;
 
 namespace FoolCardGamePlugin.Network;
 
+/// <summary>
+/// Сетевой контроллер матча
+/// </summary>
 public class MatchNetworkController : IMatchCreating, IMatchStopping
 {
     private readonly MatchesController _matchesController;
 
+    /// <summary>
+    /// Конструктор
+    /// </summary>
     public MatchNetworkController()
     {
         _matchesController = new MatchesController();
@@ -20,13 +25,18 @@ public class MatchNetworkController : IMatchCreating, IMatchStopping
     
     public bool TryCreateMatch(RoomData roomData)
     {
-        if (_matchesController.TryCreateMatch(roomData, UpdateDesk))
+        if (_matchesController.TryCreateMatch(roomData, UpdateDesk) == false)
             return false;
         
         SetClientStatusOnMatch(roomData.Clients, true);
         return true;
     }
     
+    /// <summary>
+    /// Выдать карты
+    /// </summary>
+    /// <param name="client">Клиент</param>
+    /// <param name="e">Сообщение</param>
     public void GetCards(ConnectedClient client, MessageReceivedEventArgs e)
     {
         if (client.IsInRoom == false || client.IsInMatch == false)
@@ -36,7 +46,7 @@ public class MatchNetworkController : IMatchCreating, IMatchStopping
         if (_matchesController.GetCards(ref getCardsData) == false)
             return;
         
-        NetworkSender.Instance.SendRequest(Tags.GetCards, client.Client, getCardsData);
+        NetworkSender.Instance.SendResponse(Tags.GetCards, client.Client, getCardsData);
     }
     
     private void SetClientStatusOnMatch(IEnumerable<ClientData> clients, bool status)
@@ -46,6 +56,11 @@ public class MatchNetworkController : IMatchCreating, IMatchStopping
                 ServerManager.Instance.Clients[client.Id].IsInMatch = status;
     }
     
+    /// <summary>
+    /// Обновить данные игрока
+    /// </summary>
+    /// <param name="client">Клиент</param>
+    /// <param name="e">Сообщение</param>
     public void UpdatePlayerData(ConnectedClient client, MessageReceivedEventArgs e)
     {
         if (client.IsInRoom == false || client.IsInMatch == false)
@@ -54,6 +69,11 @@ public class MatchNetworkController : IMatchCreating, IMatchStopping
         _matchesController.UpdatePlayerData(NetworkReader.Instance.Read<PlayerData>(e));
     }
 
+    /// <summary>
+    /// Обновить матч
+    /// </summary>
+    /// <param name="client">Клиент</param>
+    /// <param name="e">Сообщение</param>
     public void UpdateMatch(ConnectedClient client, MessageReceivedEventArgs e)
     {
         if (client.IsInRoom == false || client.IsInMatch == false)
@@ -67,21 +87,13 @@ public class MatchNetworkController : IMatchCreating, IMatchStopping
         if (_matchesController[roomId] == null)
             return;
         
-        SendMessagePlayers(roomId, Tags.UpdateMatch, _matchesController[roomId].Data);
+        NetworkSender.Instance.SendResponse(Tags.UpdateMatch, _matchesController[roomId].ClientIds(), _matchesController[roomId].Data);
     }
 
-    private void SendMessagePlayers<T>(string roomId, Tags tag, T data) where T : IDarkRiftSerializable
-    {
-        foreach (var clientId in _matchesController[roomId].ClientIds())
-            NetworkSender.Instance.SendRequest(tag, ServerManager.Instance.Clients[clientId].Client, data);
-    }
-    
-    private void SendMessagePlayers(string roomId, Tags tag)
-    {
-        foreach (var clientId in _matchesController[roomId].ClientIds())
-            NetworkSender.Instance.SendRequest(tag, ServerManager.Instance.Clients[clientId].Client);
-    }
-
+    /// <summary>
+    /// Обновить матч
+    /// </summary>
+    /// <param name="roomId">Id комнаты</param>
     public void StopMatch(string roomId)
     {
         if (_matchesController[roomId] == null)
@@ -96,6 +108,6 @@ public class MatchNetworkController : IMatchCreating, IMatchStopping
         if (_matchesController[roomId] == null)
             return;
         
-        SendMessagePlayers(roomId, Tags.StopRound);
+        
     }
 }

@@ -1,9 +1,10 @@
 ﻿using System;
 using DarkRift.Server;
 using FoolCardGamePlugin.Models;
+using FoolCardGamePlugin.Network;
 using FoolCardGamePlugin.Network.Enums;
 
-namespace FoolCardGamePlugin.Network;
+namespace FoolCardGamePlugin.Repositories;
 
 /// <summary>
 /// Кастомный плагин
@@ -46,7 +47,7 @@ public class FoolCardGamePlugin : Plugin
         if (ServerManager.Instance.Clients.ContainsKey(e.Client.ID.ToString()))
         {
             _roomNetworkController.LeaveRoom(ServerManager.Instance.Clients[e.Client.ID.ToString()]);
-            ServerManager.Instance.Clients.Remove(e.Client.ID.ToString());
+            ClientRepository.Instance.Entities.Remove(e.Client.ID.ToString());
         }
         e.Client.MessageReceived -= OnClientMessageReceived;
     }
@@ -57,7 +58,7 @@ public class FoolCardGamePlugin : Plugin
         string id = client.ID.ToString();
         
         if (ServerManager.Instance.Clients.ContainsKey(id) == false)
-            new ConnectedClient((IClient)sender);
+            new ConnectedClient((IClient)sender, ClientRepository.Instance);
         
         switch (e.Tag)
         {

@@ -1,5 +1,5 @@
 ﻿using DarkRift.Server;
-using FoolCardGamePlugin.Network;
+using FoolCardGamePlugin.Abstractions.Repositories;
 
 namespace FoolCardGamePlugin.Models;
 
@@ -17,13 +17,14 @@ public class ConnectedClient
     /// Конструктор
     /// </summary>
     /// <param name="client">Ссылка на клиент</param>
-    public ConnectedClient(IClient client)
+    /// <param name="clientRepository">Хранилище клиентов</param>
+    public ConnectedClient(IClient client, IRepository<string, ConnectedClient> clientRepository)
     {
         Client = client;
         Data = new ClientData(client.ID.ToString(), false);
         IsInRoom = false;
         IsInMatch = false;
         
-        ServerManager.Instance.Clients.Add(Data.Id, this);
+        clientRepository.Entities.Add(Data.Id, this);
     }
 }

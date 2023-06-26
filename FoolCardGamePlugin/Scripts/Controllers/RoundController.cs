@@ -1,21 +1,30 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using FoolCardGamePlugin.Abstractions.Controllers;
 using FoolCardGamePlugin.Models;
 
 namespace FoolCardGamePlugin.Controllers;
 
-public class RoundController
+/// <summary>
+/// Контроллер раунда
+/// </summary>
+public class RoundController : IRound
 {
     private readonly Dictionary<string, CardData?> _searchDefender;
     private readonly RoomConfig _roomConfig;
     private readonly CardData _trumpCard;
-    private string _defender;
+    private string _thrower;
     
-    public bool IsDefenderIdentified { get; private set; }
+    public bool IsThrowerIdentified { get; private set; }
 
     public event Action<string> OnDefenderSearched = delegate {  };
     
+    /// <summary>
+    /// Конструктор
+    /// </summary>
+    /// <param name="roomConfig">Конфиг комнаты</param>
+    /// <param name="trumpCard">Казырная карта</param>
     public RoundController(RoomConfig roomConfig, CardData trumpCard)
     {
         _searchDefender = new Dictionary<string, CardData?>();
@@ -23,9 +32,9 @@ public class RoundController
         _trumpCard = trumpCard;
     }
     
-    public void FindDefenderPlayer(string playerId, IEnumerable<CardData> cards)
+    public void FindFirstThrowerPlayer(string playerId, IEnumerable<CardData> cards)
     {
-        if (_searchDefender.ContainsKey(playerId) || IsDefenderIdentified)
+        if (_searchDefender.ContainsKey(playerId) || IsThrowerIdentified)
             return;
 
         var trumpCards = cards.Where(c => c.Suit == _trumpCard.Suit);
@@ -40,9 +49,13 @@ public class RoundController
         if (_searchDefender.Count != _roomConfig.MaxSlots)
             return;
         
-        _defender = _searchDefender.Where(c => c.Value != null)
-            .Aggregate((l, r) => l.Value.Value.Seniority < r.Value.Value.Seniority ? l : r).Key;
-        IsDefenderIdentified = true;
-        OnDefenderSearched.Invoke(_defender);
+        _thrower = _searchDefender.Where(c => c.Value != null)
+            .OrderBy(c => c.Value.Value.Seniority).FirstOrDefault().Key;
+
+        if (string.IsNullOrEmpty(_thrower))
+            _thrower = _searchDefender.First().Key;
+        
+        IsThrowerIdentified = true;
+        OnDefenderSearched.Invoke(_thrower);
     }
 }

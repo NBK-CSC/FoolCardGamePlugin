@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using FoolCardGamePlugin.Abstractions.Controllers;
 using FoolCardGamePlugin.Abstractions.Network;
 using FoolCardGamePlugin.Models;
 using FoolCardGamePlugin.Network;
@@ -13,7 +14,7 @@ namespace FoolCardGamePlugin.Controllers;
 public class MatchController : IMatchController
 {
     private readonly Queue<CardData> _deck;
-    private readonly RoundController _roundController;
+    private readonly IRound _round;
     private MatchData _data;
 
     public MatchData Data => _data;
@@ -34,11 +35,11 @@ public class MatchController : IMatchController
         _deck.Enqueue(trumpCard);
 
         _data = new MatchData(
-            new DeskData((byte)_deck.Count, trumpCard),
+            new DealerData((byte)_deck.Count, trumpCard),
             roomData,
             roomData.Clients.Select(c => new PlayerData(roomData.Config.Id ,c, 0)));
 
-        _roundController = new RoundController(roomData.Config, trumpCard);
+        _round = new RoundNetworkController(roomData, trumpCard);
     }
 
     /// <summary>
@@ -69,16 +70,15 @@ public class MatchController : IMatchController
             return false;
         }
 
-        cards = GetCards(Math.Min(number, _data.Desk.NumberCardsInDeck)).ToList();
-
-        var desk = _data.Desk;
+        cards = GetCards(Math.Min(number, _data.Dealer.NumberCardsInDeck)).ToList();
+        var desk = _data.Dealer;
         desk.NumberCardsInDeck = (byte)_deck.Count;
-        _data.Desk = desk;
+        _data.Dealer = desk;
         
         OnMatchUpdated.Invoke(_data.Room.Config.Id);
 
-        if (_roundController.IsDefenderIdentified == false)
-            _roundController.FindDefenderPlayer(playerData.Data.Id, cards);
+        if (_round.IsThrowerIdentified == false)
+            _round.FindFirstThrowerPlayer(playerData.Data.Id, cards);
         
         return true;
     }

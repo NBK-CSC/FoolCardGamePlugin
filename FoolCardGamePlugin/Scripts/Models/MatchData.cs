@@ -10,33 +10,33 @@ namespace FoolCardGamePlugin.Models;
 /// </summary>
 public struct MatchData : IDarkRiftSerializable
 {
-    public DeskData Desk;
+    public DealerData Dealer;
     public RoomData Room;
     public List<PlayerData> Players;
 
     /// <summary>
     /// Конструктор
     /// </summary>
-    /// <param name="desk">Стол</param>
+    /// <param name="dealer">Стол</param>
     /// <param name="room">Комната</param>
     /// <param name="players">Игрока</param>
-    public MatchData(DeskData desk, RoomData room, IEnumerable<PlayerData> players)
+    public MatchData(DealerData dealer, RoomData room, IEnumerable<PlayerData> players)
     {
-        Desk = desk;
+        Dealer = dealer;
         Room = room;
         Players = players.ToList();
     }
     
     public void Deserialize(DeserializeEvent e)
     {
-        Desk = e.Reader.ReadSerializable<DeskData>();
+        Dealer = e.Reader.ReadSerializable<DealerData>();
         Room = e.Reader.ReadSerializable<RoomData>();
         Players = e.Reader.ReadSerializables<PlayerData>().ToList();
     }
 
     public void Serialize(SerializeEvent e)
     {
-        e.Writer.Write(Desk);
+        e.Writer.Write(Dealer);
         e.Writer.Write(Room);
         e.Writer.Write(Players.ToArray());
     }
