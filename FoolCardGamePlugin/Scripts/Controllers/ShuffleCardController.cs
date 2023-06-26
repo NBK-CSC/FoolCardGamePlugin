@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using FoolCardGamePlugin.Models;
 using FoolCardGamePlugin.Network.Enums;
 
-namespace FoolCardGamePlugin.Network;
+namespace FoolCardGamePlugin.Controllers;
 
 /// <summary>
 /// Контроллер тусовщика карт

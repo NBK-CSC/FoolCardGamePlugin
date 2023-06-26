@@ -16,10 +16,10 @@ public struct CardData : IDarkRiftSerializable
     {
         Suit = suit;
         Seniority = seniority;
-        IsEmpty = true;
+        IsEmpty = false;
     }
         
-    public CardData(bool isEmpty = false)
+    public CardData(bool isEmpty = true)
     {
         Suit = Suit.Club;
         Seniority = Seniority.Two;

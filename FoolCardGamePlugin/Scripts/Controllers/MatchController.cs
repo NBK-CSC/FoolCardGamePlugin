@@ -5,6 +5,7 @@ using FoolCardGamePlugin.Abstractions.Controllers;
 using FoolCardGamePlugin.Abstractions.Network;
 using FoolCardGamePlugin.Models;
 using FoolCardGamePlugin.Network;
+using FoolCardGamePlugin.Network.Enums;
 
 namespace FoolCardGamePlugin.Controllers;
 
@@ -31,8 +32,14 @@ public class MatchController : IMatchController
     public MatchController(RoomData roomData)
     {
         _deck = new Queue<CardData>(ShuffleCardController.ShuffleCards());
-        var trumpCard = _deck.Dequeue();
-        _deck.Enqueue(trumpCard);
+
+        CardData trumpCard = new CardData(true);
+
+        while (trumpCard.IsEmpty || trumpCard.Seniority == Seniority.Ace)
+        {
+            trumpCard = _deck.Dequeue();
+            _deck.Enqueue(trumpCard);
+        }
 
         _data = new MatchData(
             new DealerData((byte)_deck.Count, trumpCard),
