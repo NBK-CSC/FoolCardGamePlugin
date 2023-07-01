@@ -71,9 +71,11 @@
     <Compile Include="Scripts\Models\ClientData.cs" />
     <Compile Include="Scripts\Models\ConnectedClient.cs" />
     <Compile Include="Scripts\Models\DealerData.cs" />
+    <Compile Include="Scripts\Models\DeskData.cs" />
     <Compile Include="Scripts\Models\GetCardsData.cs" />
     <Compile Include="Scripts\Models\MatchData.cs" />
     <Compile Include="Scripts\Models\PlayerData.cs" />
+    <Compile Include="Scripts\Models\RequestData.cs" />
     <Compile Include="Scripts\Models\RoomData.cs" />
     <Compile Include="Scripts\Models\RoomConfig.cs" />
     <Compile Include="Scripts\Models\RoundData.cs" />

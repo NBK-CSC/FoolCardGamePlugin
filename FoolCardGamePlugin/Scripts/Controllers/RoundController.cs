@@ -39,16 +39,12 @@ public class RoundController : IRound
 
         var trumpCards = cards.Where(c => c.Suit == _trumpCard.Suit);
         if (trumpCards.Any() == false)
-        {
             _searchDefender.Add(playerId, null);
-            return;
-        }
-        
-        _searchDefender.Add(playerId, trumpCards.OrderBy(c => c.Seniority).FirstOrDefault());
+        else
+            _searchDefender.Add(playerId, trumpCards.OrderBy(c => c.Seniority).FirstOrDefault());
         
         if (_searchDefender.Count != _roomConfig.MaxSlots)
             return;
-        
         _thrower = _searchDefender.Where(c => c.Value != null)
             .OrderBy(c => c.Value.Value.Seniority).FirstOrDefault().Key;
 

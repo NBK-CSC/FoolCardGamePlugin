@@ -73,9 +73,18 @@ public class MatchesController
     /// <param name="playerData"></param>
     public void UpdatePlayerData(PlayerData playerData)
     {
-        if (_matches.ContainsKey(playerData.RoomId))
+        if (_matches.ContainsKey(playerData.RoomId) == false)
             return;
         
         _matches[playerData.RoomId].UpdatePlayerData(playerData);
+    }
+    
+
+    public void UpdateDeskData(string roomId, DeskData deskData)
+    {
+        if (_matches.ContainsKey(roomId) == false)
+            return;
+        
+        _matches[roomId].UpdateDeskData(deskData);
     }
 }

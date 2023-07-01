@@ -83,8 +83,14 @@ public class FoolCardGamePlugin : Plugin
             case (ushort)Tags.UpdatePlayer:
                 _matchNetworkController.UpdatePlayerData(ServerManager.Instance.Clients[id], e);
                 break;
-            case (ushort)Tags.UpdateMatch:
-                _matchNetworkController.UpdateMatch(ServerManager.Instance.Clients[id], e);
+            case (ushort)Tags.GetMatch:
+                _matchNetworkController.GetMatch(ServerManager.Instance.Clients[id], e);
+                break;
+            case (ushort)Tags.UpdateDesk:
+                _matchNetworkController.UpdateDesk(ServerManager.Instance.Clients[id], e);
+                break;
+            case (ushort)Tags.ThrowCard:
+                _matchNetworkController.ThrowCard(ServerManager.Instance.Clients[id], e);
                 break;
         }
     }

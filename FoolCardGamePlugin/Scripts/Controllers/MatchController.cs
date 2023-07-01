@@ -33,9 +33,9 @@ public class MatchController : IMatchController
     {
         _deck = new Queue<CardData>(ShuffleCardController.ShuffleCards());
 
-        CardData trumpCard = new CardData(true);
+        CardData trumpCard = new CardData();
 
-        while (trumpCard.IsEmpty || trumpCard.Seniority == Seniority.Ace)
+        while (trumpCard.State || trumpCard.Seniority == Seniority.Ace)
         {
             trumpCard = _deck.Dequeue();
             _deck.Enqueue(trumpCard);
@@ -43,6 +43,7 @@ public class MatchController : IMatchController
 
         _data = new MatchData(
             new DealerData((byte)_deck.Count, trumpCard),
+            new DeskData(new CardData[6], new CardData[6]),
             roomData,
             roomData.Clients.Select(c => new PlayerData(roomData.Config.Id ,c, 0)));
 
@@ -58,6 +59,15 @@ public class MatchController : IMatchController
         for (var i = 0; i < Data.Players.Count; i++)
             if (string.Equals(Data.Players[i].Data.Id, playerData.Data.Id))
                 Data.Players[i] = playerData;
+        
+        OnMatchUpdated.Invoke(_data.Room.Config.Id);
+    }
+    
+    public void UpdateDeskData(DeskData deskData)
+    {
+        var temp = _data;
+        temp.Desk = deskData;
+        _data = temp;
         
         OnMatchUpdated.Invoke(_data.Room.Config.Id);
     }

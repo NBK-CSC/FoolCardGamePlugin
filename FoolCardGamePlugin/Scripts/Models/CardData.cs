@@ -10,33 +10,33 @@ public struct CardData : IDarkRiftSerializable
 {
     public Suit Suit { get; private set; }
     public Seniority Seniority { get; private set; }
-    public bool IsEmpty { get; private set; }
+    public bool State { get; private set; }
         
     public CardData(Suit suit, Seniority seniority)
     {
         Suit = suit;
         Seniority = seniority;
-        IsEmpty = false;
+        State = false;
     }
         
-    public CardData(bool isEmpty = true)
+    public CardData()
     {
         Suit = Suit.Club;
         Seniority = Seniority.Two;
-        IsEmpty = isEmpty;
+        State = true;
     }
 
     public void Deserialize(DeserializeEvent e)
     {
         Suit = (Suit)e.Reader.ReadByte();
         Seniority = (Seniority)e.Reader.ReadByte();
-        IsEmpty = e.Reader.ReadBoolean();
+        State = e.Reader.ReadBoolean();
     }
 
     public void Serialize(SerializeEvent e)
     {
         e.Writer.Write((byte)Suit);
         e.Writer.Write((byte)Seniority);
-        e.Writer.Write(IsEmpty);
+        e.Writer.Write(State);
     }
 }

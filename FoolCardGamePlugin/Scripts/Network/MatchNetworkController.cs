@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using DarkRift.Server;
 using FoolCardGamePlugin.Abstractions.Network;
 using FoolCardGamePlugin.Models;
@@ -25,7 +24,7 @@ public class MatchNetworkController : IMatchCreating, IMatchStopping
     
     public bool TryCreateMatch(RoomData roomData)
     {
-        if (_matchesController.TryCreateMatch(roomData, UpdateDesk) == false)
+        if (_matchesController.TryCreateMatch(roomData, SendMatchData) == false)
             return false;
         
         SetClientStatusOnMatch(roomData.Clients, true);
@@ -42,11 +41,15 @@ public class MatchNetworkController : IMatchCreating, IMatchStopping
         if (client.IsInRoom == false || client.IsInMatch == false)
             return;
         
-        var getCardsData = NetworkReader.Instance.Read<GetCardsData>(e);
-        if (_matchesController.GetCards(ref getCardsData) == false)
+        var requestData = NetworkReader.Instance.Read<RequestData<GetCardsData>>(e);
+
+        if (_matchesController.GetCards(ref requestData.Data) == false)
             return;
         
-        NetworkSender.Instance.SendResponse(Tags.GetCards, client.Client, getCardsData);
+        requestData.Receiver = requestData.Sender;
+        requestData.Sender = "";
+        
+        NetworkSender.Instance.SendResponse(Tags.GetCards, client.Client, requestData);
     }
     
     private void SetClientStatusOnMatch(IEnumerable<ClientData> clients, bool status)
@@ -70,24 +73,42 @@ public class MatchNetworkController : IMatchCreating, IMatchStopping
     }
 
     /// <summary>
-    /// Обновить матч
+    /// Получить матч
     /// </summary>
     /// <param name="client">Клиент</param>
     /// <param name="e">Сообщение</param>
-    public void UpdateMatch(ConnectedClient client, MessageReceivedEventArgs e)
+    public void GetMatch(ConnectedClient client, MessageReceivedEventArgs e)
     {
         if (client.IsInRoom == false || client.IsInMatch == false)
             return;
 
-        UpdateDesk(NetworkReader.Instance.Read<RoomConfig>(e).Id);
+        SendMatchData(NetworkReader.Instance.Read<RoomConfig>(e).Id);
     }
 
-    private void UpdateDesk(string roomId)
+    public void UpdateDesk(ConnectedClient client, MessageReceivedEventArgs e)
+    {
+        if (client.IsInRoom == false || client.IsInMatch == false)
+            return;
+
+        var matchData = NetworkReader.Instance.Read<MatchData>(e);
+        _matchesController.UpdateDeskData(matchData.Room.Config.Id, matchData.Desk);
+    }
+
+    public void ThrowCard(ConnectedClient client, MessageReceivedEventArgs e)
+    {
+        if (client.IsInRoom == false || client.IsInMatch == false)
+            return;
+
+        var throwData = NetworkReader.Instance.Read<RequestData<CardData>>(e);
+        NetworkSender.Instance.SendResponse(Tags.ThrowCard, throwData.Receiver, throwData);
+    }
+
+    private void SendMatchData(string roomId)
     {
         if (_matchesController[roomId] == null)
             return;
         
-        NetworkSender.Instance.SendResponse(Tags.UpdateMatch, _matchesController[roomId].ClientIds(), _matchesController[roomId].Data);
+        NetworkSender.Instance.SendResponse(Tags.UpdateDesk, _matchesController[roomId].ClientIds(), _matchesController[roomId].Data);
     }
 
     /// <summary>
@@ -100,7 +121,7 @@ public class MatchNetworkController : IMatchCreating, IMatchStopping
             return;
 
         SetClientStatusOnMatch(_matchesController[roomId].Data.Room.Clients, false);
-        _matchesController.RemoveMatch(roomId, UpdateDesk);
+        _matchesController.RemoveMatch(roomId, SendMatchData);
     }
 
     public void StopRound(string roomId)

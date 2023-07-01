@@ -58,7 +58,19 @@ public class NetworkSender
     {
         foreach (var clientId in clientsIds)
             if(ServerManager.Instance.Clients.ContainsKey(clientId))
-                SendResponse<T>(tag, ServerManager.Instance.Clients[clientId].Client, data, sendMode);
+                SendResponse(tag, clientId, data, sendMode);
+    }
+    
+    public void SendResponse<T>(Tags tag, string clientId, T[] data, SendMode sendMode = SendMode.Reliable) where T : IDarkRiftSerializable
+    {
+        if(ServerManager.Instance.Clients.ContainsKey(clientId)) 
+            SendResponse<T>(tag, ServerManager.Instance.Clients[clientId].Client, data, sendMode);
+    }
+    
+    public void SendResponse<T>(Tags tag, string clientId, T data, SendMode sendMode = SendMode.Reliable) where T : IDarkRiftSerializable
+    {
+        if(ServerManager.Instance.Clients.ContainsKey(clientId)) 
+            SendResponse<T>(tag, ServerManager.Instance.Clients[clientId].Client, data, sendMode);
     }
     
     public void SendResponse<T>(Tags tag, IEnumerable<string> clientsIds, T data, SendMode sendMode = SendMode.Reliable) where T : IDarkRiftSerializable
