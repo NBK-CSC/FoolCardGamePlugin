@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
-using FoolCardGamePlugin.Abstractions.Controllers;
 using FoolCardGamePlugin.Abstractions.Network;
 using FoolCardGamePlugin.Models;
 using FoolCardGamePlugin.Network;
@@ -15,7 +15,7 @@ namespace FoolCardGamePlugin.Controllers;
 public class MatchController : IMatchController
 {
     private readonly Queue<CardData> _deck;
-    private readonly IRound _round;
+    private readonly RoundNetworkController _round;
     private MatchData _data;
 
     public MatchData Data => _data;
@@ -45,7 +45,7 @@ public class MatchController : IMatchController
             new DealerData((byte)_deck.Count, trumpCard),
             new DeskData(new CardData[6], new CardData[6]),
             roomData,
-            roomData.Clients.Select(c => new PlayerData(roomData.Config.Id ,c, 0)));
+            roomData.Clients.Select(c => new PlayerData(roomData.Config.Id ,c, 0, false)));
 
         _round = new RoundNetworkController(roomData, trumpCard);
     }
@@ -70,6 +70,17 @@ public class MatchController : IMatchController
         _data = temp;
         
         OnMatchUpdated.Invoke(_data.Room.Config.Id);
+    }
+
+    public void StopRound(RoundData roundData)
+    {
+        if(_round.IsStarted == false)
+            return;
+        Console.WriteLine();
+        UpdateDeskData(new DeskData(new CardData[6], new CardData[6]));
+        
+        _round.StopRound();
+        _round.StartRound(roundData);
     }
 
     /// <summary>

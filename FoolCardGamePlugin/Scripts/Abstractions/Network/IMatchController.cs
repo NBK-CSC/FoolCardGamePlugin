@@ -18,4 +18,6 @@ public interface IMatchController
     /// </summary>
     /// <returns></returns>
     public IEnumerable<string> ClientIds();
+
+    public void StopRound(RoundData roundData);
 }

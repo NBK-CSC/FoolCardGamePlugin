@@ -124,11 +124,15 @@ public class MatchNetworkController : IMatchCreating, IMatchStopping
         _matchesController.RemoveMatch(roomId, SendMatchData);
     }
 
-    public void StopRound(string roomId)
+    public void StopRound(ConnectedClient client, MessageReceivedEventArgs e)
     {
-        if (_matchesController[roomId] == null)
+        if (client.IsInRoom == false || client.IsInMatch == false)
             return;
         
+        var stopRoundData = NetworkReader.Instance.Read<StopRoundData>(e);
+        if (_matchesController[stopRoundData.RoomId] == null)
+            return;
         
+        _matchesController[stopRoundData.RoomId].StopRound(stopRoundData.Data);
     }
 }

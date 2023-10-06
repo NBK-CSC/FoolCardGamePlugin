@@ -92,6 +92,9 @@ public class FoolCardGamePlugin : Plugin
             case (ushort)Tags.ThrowCard:
                 _matchNetworkController.ThrowCard(ServerManager.Instance.Clients[id], e);
                 break;
+            case (ushort)Tags.StopRound:
+                _matchNetworkController.StopRound(ServerManager.Instance.Clients[id], e);
+                break;
         }
     }
 }
