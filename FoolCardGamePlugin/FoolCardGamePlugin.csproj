@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>fc3df4f4-1764-4bb2-b12e-2a305d5f1fd7</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>FoolCardGamePlugin</RootNamespace>
+    <AssemblyName>FoolCardGamePlugin</AssemblyName>
+    <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <Deterministic>true</Deterministic>
+    <LangVersion>latest</LangVersion>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="DarkRift">
+      <HintPath>..\..\..\..\Server\Lib\DarkRift.dll</HintPath>
+    </Reference>
+    <Reference Include="DarkRift.Server">
+      <HintPath>..\..\..\..\Server\Lib\DarkRift.Server.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    
+    <Reference Include="System.Core" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    
+    
+    <Reference Include="Microsoft.CSharp" />
+    
+    <Reference Include="System.Data" />
+    
+    <Reference Include="System.Net.Http" />
+    
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Scripts\Abstractions\Controllers\IRound.cs" />
+    <Compile Include="Scripts\Abstractions\Network\IMatchController.cs" />
+    <Compile Include="Scripts\Abstractions\Network\IMatchCreating.cs" />
+    <Compile Include="Scripts\Abstractions\Network\IMatchStopping.cs" />
+    <Compile Include="Scripts\Abstractions\Repositories\IRepository.cs" />
+    <Compile Include="Scripts\Controllers\MatchController.cs" />
+    <Compile Include="Scripts\Controllers\RoomController.cs" />
+    <Compile Include="Scripts\Controllers\RoundController.cs" />
+    <Compile Include="Scripts\Controllers\ShuffleCardController.cs" />
+    <Compile Include="Scripts\Enums\Seniority.cs" />
+    <Compile Include="Scripts\Enums\Suit.cs" />
+    <Compile Include="Scripts\Enums\Tags.cs" />
+    <Compile Include="Scripts\Models\CardData.cs" />
+    <Compile Include="Scripts\Models\ClientData.cs" />
+    <Compile Include="Scripts\Models\ConnectedClient.cs" />
+    <Compile Include="Scripts\Models\DealerData.cs" />
+    <Compile Include="Scripts\Models\DeskData.cs" />
+    <Compile Include="Scripts\Models\GetCardsData.cs" />
+    <Compile Include="Scripts\Models\MatchData.cs" />
+    <Compile Include="Scripts\Models\PlayerData.cs" />
+    <Compile Include="Scripts\Models\RequestData.cs" />
+    <Compile Include="Scripts\Models\RoomData.cs" />
+    <Compile Include="Scripts\Models\RoomConfig.cs" />
+    <Compile Include="Scripts\Models\RoundData.cs" />
+    <Compile Include="Scripts\Network\FoolCardGamePlugin.cs" />
+    <Compile Include="Scripts\Network\MatchesController.cs" />
+    <Compile Include="Scripts\Network\MatchNetworkController.cs" />
+    <Compile Include="Scripts\Network\NetworkReader.cs" />
+    <Compile Include="Scripts\Network\NetworkSender.cs" />
+    <Compile Include="Scripts\Network\RoomsController.cs" />
+    <Compile Include="Scripts\Network\RoomNetworkController.cs" />
+    <Compile Include="Scripts\Network\RoundNetworkController.cs" />
+    <Compile Include="Scripts\Repositories\ClientRepository.cs" />
+    <Compile Include="Scripts\Repositories\ServerManager.cs" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+ </Project>
