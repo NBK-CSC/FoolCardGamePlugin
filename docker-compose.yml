@@ -1,0 +1,10 @@
+﻿version: "3.9"
+
+services:
+  app:
+    container_name: fool-card-game-rele
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "4201:4201"
